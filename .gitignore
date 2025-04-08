@@ -1,0 +1,4 @@
+#ignore compiled
+*.out
+#ignore frame generation
+frames*
