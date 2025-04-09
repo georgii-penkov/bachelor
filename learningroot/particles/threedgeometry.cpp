@@ -1,46 +1,6 @@
 #include <vector>
 #include <cmath>
 
-const double THRESHOLD = 0.00001;
-class Cartesian;
-class Point;
-class Vector;
-
-class Cartesian
-{
-    private:
-        double m_x;
-        double m_y;
-        double m_z;
-    public: 
-        double X(){return m_x;};
-        double Y(){return m_y;};
-        double Z(){return m_z;};
-        void SetX(double x){m_x = x;};
-        void SetY(double y){m_x = y;};
-        void SetZ(double z){m_x = z;};
-};
-
-
-
-class Point : Cartesian
-{
-    public:
-        Point operator+(Vector);
-        Vector operator-(Point);
-        void Draw();
-
-};
-
-
-class Vector : Cartesian
-{
-    public:
-        Vector Cross(Vector);
-        double Dot(Vector);
-
-};
-
 //class Point is ROOT::Math::XYZPoint
 
 void RotatePoint(ROOT::Math::XYZPoint* point, double t_x, double t_y, double t_z)
