@@ -509,7 +509,7 @@ void particles2()
     };
     hist1->SetColors(kRed);
     hist1->Draw("same");
-    hist1->SaveAs("./Signal.png");
+    hist1->Print("./Signal.png");
 //*/
     /*
     auto a = MakeBrick(350,350,350, 0,0,0);
