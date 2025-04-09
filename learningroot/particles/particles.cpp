@@ -3,6 +3,7 @@
 // using vertices create instances of ROOT TGeoPolygon 2D polygons as boundaries. for check if point in boundary, see if projection of point on all planes inside polygon. TGeoPolygon has method for last part
 #include <vector>
 #include <string>
+#include "TF1.h"
 
 
 class particle

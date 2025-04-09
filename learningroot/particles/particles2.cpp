@@ -4,6 +4,7 @@
 #include <cmath>
 #include "threedpolygon2.cpp"
 #include <tbb/tbb.h>
+//requires source /opt/intel/oneapi/tbb/latest/env/vars.sh
 #include <chrono>
 const double RADIUS = tan(M_PI/2-(M_PI/14)) * 25.6/2 + 2.5;
 
