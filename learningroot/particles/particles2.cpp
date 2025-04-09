@@ -456,6 +456,7 @@ class Detector
 void particles2()
 {
 
+    auto mycanvas = new TCanvas();
     auto rulers = new TAxis3D();
     rulers->SetAxisColor(kRed, "X");
     rulers->SetAxisColor(kGreen, "Y");
@@ -467,7 +468,7 @@ void particles2()
     double half_photons = 250000;
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0.0,1.0);
-    for (int i = -half_photons; i < half_photons+1; ++i)
+    for (int i = -half_photons; i < half_photons; ++i)
     {
         ROOT::Math::XYZPoint position(1+0.5/(2*half_photons)*i,1+0.5/(2*half_photons)*i,1+0.5/(2*half_photons)*i);
         ROOT::Math::XYZVector velocity(distribution(generator), distribution(generator), distribution(generator));
@@ -475,7 +476,7 @@ void particles2()
     };
 
     tile->PathFind(200);
-    auto hist = new TH1S("hist", "Time to catch", 1000, 0, 200);
+    auto hist = new TH1S("hist", "Time to catch", 1000, 0, 201);
     std::vector<double> times;
     for (int i = 0; i < size(tile->m_particles); ++i) {times.push_back(tile->m_particles[i]->Lifetime() + tile->m_particles[i]->Created());};
 
@@ -509,7 +510,7 @@ void particles2()
     };
     hist1->SetColors(kRed);
     hist1->Draw("same");
-    hist1->Print("./Signal.png");
+    mycanvas->SaveAs("./Signal.png");
 //*/
     /*
     auto a = MakeBrick(350,350,350, 0,0,0);
