@@ -644,7 +644,7 @@ void threedpolygon2()
 
 
 ///* //Draw a Cube with corners cut off by planes
-void threedpolygon2()
+void threedpolygon()
 {
     ROOT::Math::XYZPoint p1(0,0,-2);
     ROOT::Math::XYZPoint p2(0,0,2);

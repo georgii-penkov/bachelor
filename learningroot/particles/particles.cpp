@@ -2,7 +2,7 @@
 #include <string>
 #include <cstring>
 #include <cmath>
-#include "threedpolygon2.cpp"
+#include "threedgeometry.cpp"
 #include <tbb/tbb.h>
 //requires source /opt/intel/oneapi/tbb/latest/env/vars.sh
 #include <chrono>
@@ -345,10 +345,11 @@ class Tile
                 //inaccuracies in calculating dt may cause particle to be outside after moving by dt.
                 //to avoid this we use following while loop, which in extreme cases will even back the particle up using negative dt
                 //mostly affects small dt, so 2 reflections in a row, or iterations over small times such as by Animate()
+                double smallt = 0.00001*dt;
                 ROOT::Math::XYZPoint projection2 = particle->Project(dt);
                 while (!m_scintillator->HasInsideStrict(&projection2))
                 {
-                    dt = dt-THRESHOLD;
+                    dt = dt-smallt;
                     projection2 = particle->Project(dt);
                 };
                 particle->Move(dt);
@@ -362,8 +363,8 @@ class Tile
                 //*/
                 ROOT::Math::XYZVector normal = m_scintillator->Normal(&bounce_point);
                 particle->Reflect(&normal);
-                if (dt +THRESHOLD >= time) {break;};
                 time = time - dt;
+                if (time < 0) return;
                 projection = particle->Project(time);
             };
             particle->Move(time);
@@ -453,7 +454,7 @@ class Detector
 
 
 
-void particles2()
+void particles()
 {
 
     auto mycanvas = new TCanvas();
@@ -463,9 +464,9 @@ void particles2()
     rulers->SetAxisColor(kBlue, "Z");
     rulers->Draw();
 
-/*
+///*
     auto tile = new Tile(0,0,0,0,0,0, true);
-    double half_photons = 250000;
+    double half_photons = 2500;
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0.0,1.0);
     for (int i = -half_photons; i < half_photons; ++i)
@@ -511,13 +512,13 @@ void particles2()
     hist1->SetColors(kRed);
     hist1->Draw("same");
     mycanvas->SaveAs("./Signal.png");
-*/
-    ///*
+//*/
+    /*
     auto a = MakeBrick(350,350,350, 0,0,0);
     a->DrawWires();
     Detector detector;
     detector.Draw();
-    //*/
+    */
 
 };
 
