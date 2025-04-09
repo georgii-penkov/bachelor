@@ -33,7 +33,23 @@ class Point : public Cartesian
         void Draw() const;
 
 };
+Point Point::operator+(const Vector& vector)
+{
+    Point result;
+    result.SetX(this->X() + vector.X());
+    result.SetY(this->Y() + vector.Y());
+    result.SetZ(this->Z() + vector.Z());
+    return result;
+};
 
+Vector Point::operator-(const Point& point)
+{
+    Vector result;
+    result.SetX(this->X() - point.X());
+    result.SetY(this->Y() - point.Y());
+    result.SetZ(this->Z() - point.Z());
+    return result;
+}
 
 class Vector : public Cartesian
 {
@@ -43,8 +59,8 @@ class Vector : public Cartesian
         Vector operator+(const Vector&);
         Vector operator-(const Vector&);
         Vector& operator*=(const double&);
-
-
+        Vector Unit();
+        double Mag2();
 };
 
 Vector& Vector::operator*=(const double& scalar)
