@@ -1,7 +1,45 @@
 #include <vector>
 #include <cmath>
 
-const double THRESHOLD = 0.0001;
+const double THRESHOLD = 0.00001;
+class Cartesian;
+class Point;
+class Vector;
+
+class Cartesian
+{
+    private:
+        double m_x;
+        double m_y;
+        double m_z;
+    public: 
+        double X(){return m_x;};
+        double Y(){return m_y;};
+        double Z(){return m_z;};
+        void SetX(double x){m_x = x;};
+        void SetY(double y){m_x = y;};
+        void SetZ(double z){m_x = z;};
+};
+
+
+
+class Point : Cartesian
+{
+    public:
+        Point operator+(Vector);
+        Vector operator-(Point);
+        void Draw();
+
+};
+
+
+class Vector : Cartesian
+{
+    public:
+        Vector Cross(Vector);
+        double Dot(Vector);
+
+};
 
 //class Point is ROOT::Math::XYZPoint
 
@@ -50,13 +88,13 @@ class Line
     };
     bool IsParallel(Line *secondline)
     {
-        if ((this->vector.Cross(secondline->vector)).Mag2() < THRESHOLD) {return(true);}
+        if ((this->vector.Unit().Cross(secondline->vector.Unit())).Mag2() < THRESHOLD) {return(true);}
         else {return(false);};
     };
 
     bool IsWindschief(Line *secondline)
     {
-        if((this->point-secondline->point).Dot(this->vector.Cross(secondline->vector)) * (this->point-secondline->point).Dot(this->vector.Cross(secondline->vector)) < THRESHOLD) {return(false);}
+        if (pow((this->point-secondline->point).Unit().Dot(this->vector.Unit().Cross(secondline->vector.Unit())),2) < THRESHOLD) {return(false);}
         else {return(true);};
     };
 
@@ -68,6 +106,7 @@ class Line
     void Draw(double length)
     {
         auto line3d = new TPolyLine3D;
+        length = length/2;
         line3d->SetNextPoint(this->point.X() + length*this->vector.X(), this->point.Y() + length*this->vector.Y(), this->point.Z() + length*this->vector.Z());
         line3d->SetNextPoint(this->point.X() - length*this->vector.X(), this->point.Y() - length*this->vector.Y(), this->point.Z() - length*this->vector.Z());
         line3d->Draw();
@@ -123,7 +162,7 @@ class Plane
 
     bool HasInsideStrict(ROOT::Math::XYZPoint *point)
     {
-        if ((*point-this->point).Dot(this->normal) > THRESHOLD){return(true);}
+        if ((*point-this->point).Unit().Dot(this->normal.Unit()) > THRESHOLD){return(true);}   
         else {return(false);};
     }
 
@@ -131,18 +170,18 @@ class Plane
     {
         //if projection of connecting line between point in plane and ?point
         //onto normal vector of plane is positive, point is inside the plane
-        if ((*point-this->point).Dot(this->normal) >= -THRESHOLD){return(true);}
+        if ((*point-this->point).Unit().Dot(this->normal.Unit()) >= -THRESHOLD){return(true);}
         else {return(false);};
     };
 
     bool IsOnPlane(ROOT::Math::XYZPoint *point)
     {
-        if (((*point-this->point).Dot(this->normal)) * ((*point-this->point).Dot(this->normal)) <= THRESHOLD) {return(true);}
+        if (pow(((*point-this->point).Unit().Dot(this->normal.Unit())),2) <= THRESHOLD) {return(true);}
         else {return(false);};
     };
     void Move(double x, double y, double z)
     {
-        MovePoint(&this->point, x, y, z);
+        MovePoint(&(this->point), x, y, z);
     };
 };
 
@@ -195,9 +234,10 @@ class Face
     };
     bool IsInFace(ROOT::Math::XYZPoint *point)
     {
-        bool is_on_plane = plane->IsOnPlane(point);
+        //bool is_on_plane = plane->IsOnPlane(point);
+        bool is_on_plane = true;
         bool is_inside_vertices;
-        is_inside_vertices = ((Area(point) - Area(&middle)) <= THRESHOLD*size(vertices)*size(vertices));        
+        is_inside_vertices = ((Area(point) - Area(&middle)) <= THRESHOLD*size(vertices)*size(vertices));
         return(is_on_plane and is_inside_vertices);
     };
 
@@ -603,7 +643,7 @@ void threedpolygon2()
 */
 
 
-/* //Draw a Cube with corners cut off by planes
+///* //Draw a Cube with corners cut off by planes
 void threedpolygon2()
 {
     ROOT::Math::XYZPoint p1(0,0,-2);
@@ -649,4 +689,4 @@ void threedpolygon2()
 
     rulers->Draw();
 };
-*/
+//*/
