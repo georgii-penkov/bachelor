@@ -461,7 +461,7 @@ void particles()
 
 ///*
     auto tile = new Tile(0,0,0,0,0,0, true);
-    double half_photons = 25;
+    double half_photons = 250000;
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0.0,1.0);
     for (int i = -half_photons; i < half_photons; ++i)
@@ -508,12 +508,12 @@ void particles()
     mycanvas->SaveAs("./Signal.png");
 
 //*/
-    /*
+    ///*
     auto a = MakeBrick(350,350,350, 0,0,0);
     a->DrawWires();
     Detector detector;
     detector.Draw();
-    */
+    //*/
 
 };
 
