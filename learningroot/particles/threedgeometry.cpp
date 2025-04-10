@@ -1,25 +1,195 @@
 #include <vector>
 #include <cmath>
 
-//class Point is ROOT::Math::XYZPoint
+const double THRESHOLD = 0.00001;
+class Cartesian;
+class Point;
+class Vector;
 
-void RotatePoint(ROOT::Math::XYZPoint* point, double t_x, double t_y, double t_z)
+class Cartesian
 {
-    ROOT::Math::XYZPoint old_point = *point;
+    private:
+        double m_x;
+        double m_y;
+        double m_z;
+    public: 
+        Cartesian(const double& x = 0.0, const double& y = 0.0, const double& z = 0.0): m_x(x), m_y(y), m_z(z){};
+        double X() const {return m_x;};
+        double Y() const {return m_y;};
+        double Z() const {return m_z;};
+        void SetX(double x){m_x = x;};
+        void SetY(double y){m_y = y;};
+        void SetZ(double z){m_z = z;};
+        void SetCoordinates(const double&, const double&, const double&);
+        double Mag2();
+        Cartesian& operator=(const Cartesian&);
+        Cartesian operator+(const Cartesian&);
+};
+
+void Cartesian::SetCoordinates(const double& x, const double& y, const double& z)
+{
+    m_x = x;
+    m_y = y;
+    m_z = z;
+};
+
+double Cartesian::Mag2()
+{
+    return(this->X()*this->X() + this->Y()*this->Y() + this->Z()*this->Z());
+};
+
+Cartesian& Cartesian::operator=(const Cartesian& second)
+{
+    this->SetX(second.X());
+    this->SetY(second.Y());
+    this->SetZ(second.Z());
+    return(*this);
+};
+
+Cartesian Cartesian::operator+(const Cartesian& second)
+{
+    Cartesian result;
+    result.SetCoordinates(this->X()+second.X(), this->Y()+second.Y(), this->Z()+second.Z());
+    return result;
+};
+
+class Point : public Cartesian
+{
+    public:
+        Point(const double& x = 0, const double& y = 0, const double& z = 0) : Cartesian(x,y,z) {};
+        using Cartesian::operator=;
+        using Cartesian::operator+;
+        Point operator+(const Vector&);
+        Vector operator-(const Point&);
+        void Draw() const;
+
+};
+
+class Vector : public Cartesian
+{
+    public:
+        Vector(const double& x = 0, const double& y = 0, const double& z = 0) : Cartesian(x,y,z) {};
+        using Cartesian::operator=;
+        using Cartesian::operator+;
+        Vector operator+(const Vector&);
+        Vector operator-(const Vector&);
+        Vector& operator+=(const Vector&);
+        Vector& operator*=(const double&);
+        Vector operator/(const double&);
+        Vector Cross(const Vector&);
+        double Dot(const Vector&);
+        Vector Unit();
+};
+Vector operator*(const double&, const Vector&);
+Vector operator*(const Vector&, const double&);
+
+
+Point Point::operator+(const Vector& vector)
+{
+    Point result;
+    result.SetX(this->X() + vector.X());
+    result.SetY(this->Y() + vector.Y());
+    result.SetZ(this->Z() + vector.Z());
+    return result;
+};
+
+Vector Point::operator-(const Point& point)
+{
+    Vector result;
+    result.SetX(this->X() - point.X());
+    result.SetY(this->Y() - point.Y());
+    result.SetZ(this->Z() - point.Z());
+    return result;
+}
+
+Vector Vector::operator+(const Vector& vector)
+{
+    Vector result;
+    result.SetX(this->X()+vector.X());
+    result.SetY(this->Y()+vector.Y());
+    result.SetZ(this->Z()+vector.Z());
+    return result;
+};
+
+Vector Vector::operator-(const Vector& vector)
+{
+    return(*this + (-1.0*vector));
+};
+
+Vector& Vector::operator+=(const Vector& vector)
+{
+    this->SetX(this->X() + vector.X());
+    this->SetY(this->Y() + vector.Y());
+    this->SetZ(this->Z() + vector.Z());
+    return(*this);
+}
+
+Vector& Vector::operator*=(const double& scalar)
+{
+    this->SetX(this->X()*scalar);
+    this->SetY(this->Y()*scalar);
+    this->SetZ(this->Z()*scalar);
+    return(*this);
+};
+
+Vector Vector::operator/(const double& scalar)
+{
+    return((*this)*(1/scalar));
+};
+
+Vector Vector::Cross(const Vector& vector)
+{
+    Vector result;
+    result.SetX(this->Y()*vector.Z() - this->Z()*vector.Y());
+    result.SetY(this->Z()*vector.X() - this->X()*vector.Z());
+    result.SetZ(this->X()*vector.Y() - this->Y()*vector.X());
+    return result;
+};
+
+double Vector::Dot(const Vector& vector)
+{
+    return(this->X()*vector.X() + this->Y()*vector.Y()+ this->Z()*vector.Z());
+}
+
+Vector Vector::Unit()
+{
+    return((*this)*(1/sqrt(this->Dot(*this))));
+};
+
+Vector operator*(const double& scalar, const Vector& vector)
+{
+    Vector result = vector;
+    result *= scalar;
+    return(result);
+};
+Vector operator*(const Vector& vector, const double& scalar)
+{
+    Vector result = vector;
+    result *= scalar;
+    return(result);
+};
+
+
+
+
+void RotatePoint(Point* point, double t_x, double t_y, double t_z)
+{
+    Point old_point = *point;
+    //Use Setter method to avoid result turning into a vector because of minus operation (Point - Point = Vector)
     point->SetX(old_point.X()*cos(t_y)*cos(t_z) + old_point.Y()*(sin(t_x)*sin(t_y)*cos(t_z) - cos(t_x)*sin(t_z)) + old_point.Z()*(cos(t_x)*sin(t_y)*cos(t_z) + sin(t_x)*sin(t_z)));
     point->SetY(old_point.X()*cos(t_y)*sin(t_z) + old_point.Y()*(sin(t_x)*sin(t_y)*sin(t_z) + cos(t_x)*cos(t_z)) + old_point.Z()*(cos(t_x)*sin(t_y)*sin(t_z) + sin(t_x)*cos(t_z)));
     point->SetZ(old_point.X()*(-1*sin(t_y)) + old_point.Y()*sin(t_x)*cos(t_y) + old_point.Z()*cos(t_x)*cos(t_y));
 };
 
-void RotateVector(ROOT::Math::XYZVector *vector, double t_x, double t_y, double t_z)
+void RotateVector(Vector *vector, double t_x, double t_y, double t_z)
 {
-    ROOT::Math::XYZVector old_vector = *vector;
+    Vector old_vector = *vector;
     vector->SetX(old_vector.X()*cos(t_y)*cos(t_z) + old_vector.Y()*(sin(t_x)*sin(t_y)*cos(t_z) - cos(t_x)*sin(t_z)) + old_vector.Z()*(cos(t_x)*sin(t_y)*cos(t_z) + sin(t_x)*sin(t_z)));
     vector->SetY(old_vector.X()*cos(t_y)*sin(t_z) + old_vector.Y()*(sin(t_x)*sin(t_y)*sin(t_z) + cos(t_x)*cos(t_z)) + old_vector.Z()*(cos(t_x)*sin(t_y)*sin(t_z) + sin(t_x)*cos(t_z)));
     vector->SetZ(old_vector.X()*(-1*sin(t_y)) + old_vector.Y()*sin(t_x)*cos(t_y) + old_vector.Z()*cos(t_x)*cos(t_y));
 };
 
-void MovePoint(ROOT::Math::XYZPoint *point, double x, double y, double z)
+void MovePoint(Point *point, double x, double y, double z)
 {
     point->SetCoordinates(point->X()+x, point->Y()+y, point->Z()+z);
 };
@@ -27,20 +197,20 @@ void MovePoint(ROOT::Math::XYZPoint *point, double x, double y, double z)
 class Line
 {
     public:
-    ROOT::Math::XYZPoint point;
-    ROOT::Math::XYZVector vector;
+    Point point;
+    Vector vector;
     Line()
     {
 
     };
-    Line(ROOT::Math::XYZPoint point, ROOT::Math::XYZVector vector)
+    Line(Point point, Vector vector)
     {
         this->point = point;
         this->vector = vector.Unit();
     };
-    ROOT::Math::XYZPoint Intersection(Line *secondline)
+    Point Intersection(Line *secondline)
     {
-        ROOT::Math::XYZPoint intersection;
+        Point intersection;
         float t = sqrt((this->point-secondline->point).Cross(secondline->vector).Mag2()/this->vector.Cross(secondline->vector).Mag2());
         if (this->vector.Dot(secondline->point - this->point) < 0) {t = -t;};
         intersection = this->point + t*this->vector;
@@ -79,13 +249,13 @@ class Plane
     //a plane is fully defined by a point and a normal vector
     //this point may later be shifted to be in the center of a face
     public:
-    ROOT::Math::XYZPoint point;
-    ROOT::Math::XYZVector normal;
+    Point point;
+    Vector normal;
     Plane()
     {
 
     };
-    Plane(ROOT::Math::XYZPoint point, ROOT::Math::XYZVector normal)
+    Plane(Point point, Vector normal)
     {
         this->point = point;
         this->normal = normal.Unit();
@@ -102,7 +272,7 @@ class Plane
         Line liner;
         liner.vector = this->normal.Cross(secondplane->normal);
         double t;
-        ROOT::Math::XYZVector b;
+        Vector b;
         b = this->normal.Unit()*(secondplane->normal.Dot(this->normal))-secondplane->normal;
         if ( (secondplane->point-this->point).Dot(b)<0 ) {b = -1*b;};
         t = -(this->point-secondplane->point).Dot(secondplane->normal)/(b.Dot(secondplane->normal));
@@ -111,30 +281,30 @@ class Plane
         return(liner);
     };
 
-    ROOT::Math::XYZPoint Intersection(Line* line)
+    Point Intersection(Line* line)
     {
-        ROOT::Math::XYZPoint x;
-        double t =((line->point - this->point).Dot(this->normal))/(line->vector.Dot(this->normal));
-        x = line->point - t * line->vector;
+        Point x;
+        double t =-((line->point - this->point).Dot(this->normal))/(line->vector.Dot(this->normal));
+        x = line->point + t * line->vector;
         return(x);
     };
 
 
-    bool HasInsideStrict(ROOT::Math::XYZPoint *point)
+    bool HasInsideStrict(Point *point)
     {
         if ((*point-this->point).Unit().Dot(this->normal.Unit()) > THRESHOLD){return(true);}   
         else {return(false);};
     }
 
-    bool HasInside(ROOT::Math::XYZPoint *point)
+    bool HasInside(Point *point)
     {
         //if projection of connecting line between point in plane and ?point
         //onto normal vector of plane is positive, point is inside the plane
-        if ((*point-this->point).Unit().Dot(this->normal.Unit()) >= -THRESHOLD){return(true);}
+        if ((*point-this->point).Unit().Dot(this->normal.Unit()) >= -THRESHOLD){return(true);}  //BAD THRESHOLD. Other uses of threshold allow threshold e-10, this max e-5
         else {return(false);};
     };
 
-    bool IsOnPlane(ROOT::Math::XYZPoint *point)
+    bool IsOnPlane(Point *point)
     {
         if (pow(((*point-this->point).Unit().Dot(this->normal.Unit())),2) <= THRESHOLD) {return(true);}
         else {return(false);};
@@ -152,11 +322,11 @@ class Face
     //normal vector of corresponding plane defines the which way from the face is inside the 3d polygon
     public:
     Plane* plane;
-    std::vector<ROOT::Math::XYZPoint> vertices;
-    ROOT::Math::XYZPoint middle;
+    std::vector<Point> vertices;
+    Point middle;
     TPolyLine3D lines;
     double reflective;
-    Face(ROOT::Math::XYZPoint point, ROOT::Math::XYZVector normal, double reflective = 1)
+    Face(Point point, Vector normal, double reflective = 1)
     {
         this->plane = new Plane(point, normal);
         this->reflective = reflective;
@@ -167,20 +337,20 @@ class Face
         return(this->plane->IsParallel(secondface->plane));
     };
 
-    bool HasInside(ROOT::Math::XYZPoint *point)
+    bool HasInside(Point *point)
     {
         return(this->plane->HasInside(point));
     };
 
-    bool HasInsideStrict(ROOT::Math::XYZPoint *point)
+    bool HasInsideStrict(Point *point)
     {
         return(this->plane->HasInsideStrict(point));
     };
 
-    double Area(ROOT::Math::XYZPoint *point)    //return sum of areas of triangles between point and sequentially vertices of face
+    double Area(Point *point)    //return sum of areas of triangles between point and sequentially vertices of face
     {
         double area = 0;
-        std::vector<ROOT::Math::XYZVector> relative_vectors;
+        std::vector<Vector> relative_vectors;
         for (int i = 0; i < size(vertices); ++i)
         {
             relative_vectors.push_back(vertices[i] - *point);
@@ -192,7 +362,7 @@ class Face
         };
         return(area);
     };
-    bool IsInFace(ROOT::Math::XYZPoint *point)
+    bool IsInFace(Point *point)
     {
         //bool is_on_plane = plane->IsOnPlane(point);
         bool is_on_plane = true;
@@ -239,7 +409,7 @@ class Threedpolygon
 {
     public:
         std::vector<Face*> faces;
-        Threedpolygon(std::vector<ROOT::Math::XYZPoint> points, std::vector<ROOT::Math::XYZVector> normals)
+        Threedpolygon(std::vector<Point> points, std::vector<Vector> normals)
         {
             //create the list of faces and initialize with the points and normals
             for (int i = 0; i < size(points); ++i)
@@ -266,7 +436,7 @@ class Threedpolygon
             for (int i = 0; i < size(faces); ++i)
             {
                 std::vector<Line> lines;
-                std::vector<ROOT::Math::XYZPoint> preliminary_vertices;
+                std::vector<Point> preliminary_vertices;
                 for (int j = 0; j < size(faces); ++j)
                 {
                     if (i==j){continue;};
@@ -311,9 +481,9 @@ class Threedpolygon
             };
         }
 
-        ROOT::Math::XYZVector Normal(ROOT::Math::XYZPoint *point)
+        Vector Normal(Point *point)
         {
-            ROOT::Math::XYZVector normal(0,0,0);
+            Vector normal(0,0,0);
             for (int i = 0; i < size(this->faces); ++i)
             {
                 if (faces[i]->IsInFace(point)) {normal += faces[i]->plane->normal;};
@@ -321,7 +491,7 @@ class Threedpolygon
             return(normal);
         };
 
-        bool HasInside(ROOT::Math::XYZPoint *point)
+        bool HasInside(Point *point)
         {
             bool is_inside = true;
             for (int i = 0; i < size(this->faces); ++i)
@@ -331,7 +501,7 @@ class Threedpolygon
             return(is_inside);
         };
 
-        bool HasInsideStrict(ROOT::Math::XYZPoint *point)
+        bool HasInsideStrict(Point *point)
         {
             bool is_inside = true;
             for (int i = 0; i < size(this->faces); ++i)
@@ -341,28 +511,30 @@ class Threedpolygon
             return(is_inside);
         };
 
-        void SortVertices(Face* face, std::vector<ROOT::Math::XYZPoint> preliminary_vertices)
+        void SortVertices(Face* face, std::vector<Point> preliminary_vertices)
         {
-            ROOT::Math::XYZVector sum;
+            Point sum;
             for (int i = 0; i < size(preliminary_vertices); ++i)
             {
                 sum = sum + preliminary_vertices[i];
             };
-            ROOT::Math::XYZVector middle = sum/size(preliminary_vertices);
+            Vector middle;
+            middle = sum;
+            middle = middle/size(preliminary_vertices);
             face->middle = middle;
-            std::vector<ROOT::Math::XYZPoint> relative_vectors;
+            std::vector<Vector> relative_vectors;
             for (int i = 0; i < size(preliminary_vertices); ++i)
             {
-                relative_vectors.push_back(preliminary_vertices[i] - middle);
+                relative_vectors.push_back(preliminary_vertices[i] - face->middle);
             };
             //Set the first vertex
-            std::vector<ROOT::Math::XYZPoint> sorted_vertices;
-            ROOT::Math::XYZPoint x;
+            std::vector<Point> sorted_vertices;
+            Point x;
             x.SetCoordinates(preliminary_vertices[0].X(), preliminary_vertices[0].Y(), preliminary_vertices[0].Z());
             sorted_vertices.push_back(x);
 
 
-            ROOT::Math::XYZVector reference;
+            Vector reference;
             reference = relative_vectors[0];
             std::vector<double> angles;
             angles.push_back(-10);
@@ -385,7 +557,7 @@ class Threedpolygon
                     if (angles[j] > largest) {index = j; largest = angles[j];};
                 };
                 angles[index] = -10;
-                ROOT::Math::XYZPoint x;
+                Point x;
                 x.SetCoordinates(preliminary_vertices[index].X(), preliminary_vertices[index].Y(), preliminary_vertices[index].Z());
                 sorted_vertices.push_back(x);
             };
@@ -402,20 +574,20 @@ class Threedpolygon
             for (int i = 0; i < size(faces); ++i) {faces[i]->DrawWires();};
         };
 
-        std::vector<ROOT::Math::XYZPoint> Intersection(Line *line)
+        std::vector<Point> Intersection(Line *line)
         {
-            std::vector<ROOT::Math::XYZPoint> points;
+            std::vector<Point> points;
             for (int i = 0; i < size(faces); ++i)
             {
-                ROOT::Math::XYZPoint point;
+                Point point;
                 point = faces[i]->plane->Intersection(line);
                 if (faces[i]->IsInFace(&point)) {points.push_back(point);};
             };
             return(points);
         };
-        std::vector<ROOT::Math::XYZPoint> PositiveIntersection(Line *line)
+        std::vector<Point> PositiveIntersection(Line *line)
         {
-            std::vector<ROOT::Math::XYZPoint> points;
+            std::vector<Point> points;
             points = Intersection(line);
             for (int i = size(points)-1; i >=0 ; --i)
             {
@@ -424,9 +596,9 @@ class Threedpolygon
             };
             return(points);
         };
-        ROOT::Math::XYZPoint FirstPositiveIntersection(Line * line)
+        Point FirstPositiveIntersection(Line * line)
         {
-            std::vector<ROOT::Math::XYZPoint> points = PositiveIntersection(line);
+            std::vector<Point> points = PositiveIntersection(line);
             double smallest = (points[0]-line->point).Mag2();
             int index = 0;
             for (int i = 0; i < size(points); ++i)
@@ -463,10 +635,10 @@ void threedpolygon2()
 {
 
     //Testing finding intersection of planes (=line)
-    ROOT::Math::XYZPoint p;
-    ROOT::Math::XYZPoint q;
-    ROOT::Math::XYZVector n;
-    ROOT::Math::XYZVector m;
+    Point p;
+    Point q;
+    Vector n;
+    Vector m;
     p.SetCoordinates(0,0,0);
     n.SetCoordinates(-1,0,0);
     q.SetCoordinates(1,1,1);
@@ -477,10 +649,10 @@ void threedpolygon2()
     std::cout << cross.point << std::endl << cross.vector << std::endl;
     
     //Testing finding intersection of lines (=point)
-    ROOT::Math::XYZPoint p;
-    ROOT::Math::XYZPoint q;
-    ROOT::Math::XYZVector l;
-    ROOT::Math::XYZVector m;
+    Point p;
+    Point q;
+    Vector l;
+    Vector m;
     p.SetCoordinates(0,0,0);
     l.SetCoordinates(0,2,0);
     q.SetCoordinates(7,1,0);
@@ -490,37 +662,37 @@ void threedpolygon2()
     std::cout << X.Intersection(&Y) << std::endl;
     std::cout << Y.Intersection(&X) << std::endl;
     
-    ROOT::Math::XYZPoint p1(0,0,-2);
-    ROOT::Math::XYZPoint p2(0,0,2);
-    ROOT::Math::XYZPoint p3(2, 0, 0);
-    ROOT::Math::XYZPoint p4(-2, 0, 0);
-    ROOT::Math::XYZPoint p5(0, 2, 0);
-    ROOT::Math::XYZPoint p6(0, -2, 0);
-    ROOT::Math::XYZPoint p7(1.5, 1.5, 1.5);
-    ROOT::Math::XYZPoint p8(-1.5, 1.5, 1.5);
-    ROOT::Math::XYZPoint p9(1.5, -1.5, 1.5);
-    ROOT::Math::XYZPoint p10(1.5, 1.5, -1.5);
-    ROOT::Math::XYZPoint p11(-1.5, -1.5, 1.5);
-    ROOT::Math::XYZPoint p12(1.5, -1.5, -1.5);
-    ROOT::Math::XYZPoint p13(-1.5, 1.5, -1.5);
-    ROOT::Math::XYZPoint p14(-1.5, -1.5, -1.5);
+    Point p1(0,0,-2);
+    Point p2(0,0,2);
+    Point p3(2, 0, 0);
+    Point p4(-2, 0, 0);
+    Point p5(0, 2, 0);
+    Point p6(0, -2, 0);
+    Point p7(1.5, 1.5, 1.5);
+    Point p8(-1.5, 1.5, 1.5);
+    Point p9(1.5, -1.5, 1.5);
+    Point p10(1.5, 1.5, -1.5);
+    Point p11(-1.5, -1.5, 1.5);
+    Point p12(1.5, -1.5, -1.5);
+    Point p13(-1.5, 1.5, -1.5);
+    Point p14(-1.5, -1.5, -1.5);
 
-    ROOT::Math::XYZVector n1(0,0,1);
-    ROOT::Math::XYZVector n2(0,0,-1);
-    ROOT::Math::XYZVector n3(-1, 0, 0);
-    ROOT::Math::XYZVector n4(1, 0, 0);
-    ROOT::Math::XYZVector n5(0, -1, 0);
-    ROOT::Math::XYZVector n6(0, 1, 0);
-    ROOT::Math::XYZVector n7(-1, -1, -1);
-    ROOT::Math::XYZVector n8(1, -1, -1);
-    ROOT::Math::XYZVector n9(-1, 1, -1);
-    ROOT::Math::XYZVector n10(-1, -1, 1);
-    ROOT::Math::XYZVector n11(1, 1, -1);
-    ROOT::Math::XYZVector n12(-1, 1, 1);
-    ROOT::Math::XYZVector n13(1, -1, 1);
-    ROOT::Math::XYZVector n14(1, 1, 1);
-    std::vector<ROOT::Math::XYZPoint> p = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14};
-    std::vector<ROOT::Math::XYZVector> n = {n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14};
+    Vector n1(0,0,1);
+    Vector n2(0,0,-1);
+    Vector n3(-1, 0, 0);
+    Vector n4(1, 0, 0);
+    Vector n5(0, -1, 0);
+    Vector n6(0, 1, 0);
+    Vector n7(-1, -1, -1);
+    Vector n8(1, -1, -1);
+    Vector n9(-1, 1, -1);
+    Vector n10(-1, -1, 1);
+    Vector n11(1, 1, -1);
+    Vector n12(-1, 1, 1);
+    Vector n13(1, -1, 1);
+    Vector n14(1, 1, 1);
+    std::vector<Point> p = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14};
+    std::vector<Vector> n = {n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14};
     Threedpolygon polygon(p, n);
     polygon.DrawVertices();
     polygon.DrawWires();
@@ -538,11 +710,11 @@ void threedpolygon2()
 /*
 void threedpolygon2()
 {
-    ROOT::Math::XYZPoint p(10, 10, 10);
-    ROOT::Math::XYZVector l(1,2,3);
+    Point p(10, 10, 10);
+    Vector l(1,2,3);
 
-    ROOT::Math::XYZPoint q(5, 2, 3);
-    ROOT::Math::XYZVector n(0,0,1);
+    Point q(5, 2, 3);
+    Vector n(0,0,1);
 
     Plane plane(q, n);
     Line line(p,l);
@@ -554,26 +726,26 @@ void threedpolygon2()
 /* //Draw a cube and find intersection with line=pline + t*lline
 void threedpolygon2()
 {
-    ROOT::Math::XYZPoint p1(0,0,-2);
-    ROOT::Math::XYZPoint p2(0,0,2);
-    ROOT::Math::XYZPoint p3(2, 0, 0);
-    ROOT::Math::XYZPoint p4(-2, 0, 0);
-    ROOT::Math::XYZPoint p5(0, 2, 0);
-    ROOT::Math::XYZPoint p6(0, -2, 0);
+    Point p1(0,0,-2);
+    Point p2(0,0,2);
+    Point p3(2, 0, 0);
+    Point p4(-2, 0, 0);
+    Point p5(0, 2, 0);
+    Point p6(0, -2, 0);
 
-    ROOT::Math::XYZVector n1(0,0,1);
-    ROOT::Math::XYZVector n2(0,0,-1);
-    ROOT::Math::XYZVector n3(-1, 0, 0);
-    ROOT::Math::XYZVector n4(1, 0, 0);
-    ROOT::Math::XYZVector n5(0, -1, 0);
-    ROOT::Math::XYZVector n6(0, 1, 0);
+    Vector n1(0,0,1);
+    Vector n2(0,0,-1);
+    Vector n3(-1, 0, 0);
+    Vector n4(1, 0, 0);
+    Vector n5(0, -1, 0);
+    Vector n6(0, 1, 0);
 
 
-    ROOT::Math::XYZPoint pline(0, 0, 0);
-    ROOT::Math::XYZVector lline(1,1,1);
+    Point pline(0, 0, 0);
+    Vector lline(1,1,1);
 
-    std::vector<ROOT::Math::XYZPoint> p = {p1, p2, p3, p4, p5, p6};
-    std::vector<ROOT::Math::XYZVector> n = {n1, n2, n3, n4, n5, n6};
+    std::vector<Point> p = {p1, p2, p3, p4, p5, p6};
+    std::vector<Vector> n = {n1, n2, n3, n4, n5, n6};
     Threedpolygon polygon(p, n);
     Line line(pline, lline);
     polygon.DrawVertices();
@@ -585,14 +757,14 @@ void threedpolygon2()
     rulers->SetAxisColor(kBlue, "Z");
     rulers->SetAxisRange(-4, 4, rulers->GetOption());
 
-    std::vector<ROOT::Math::XYZPoint> points;
+    std::vector<Point> points;
     points = polygon.Intersection(&line);
     for (int i = 0; i < size(points); ++i)
     {
         std::cout << points[i] << std::endl;
     };
     std::cout << std::endl;
-    std::vector<ROOT::Math::XYZPoint> points2;
+    std::vector<Point> points2;
     points2 = polygon.PositiveIntersection(&line);
     for (int i = 0; i < size(points2); ++i)
     {
@@ -604,39 +776,39 @@ void threedpolygon2()
 
 
 ///* //Draw a Cube with corners cut off by planes
-void threedpolygon()
+void threedgeometry()
 {
-    ROOT::Math::XYZPoint p1(0,0,-2);
-    ROOT::Math::XYZPoint p2(0,0,2);
-    ROOT::Math::XYZPoint p3(2, 0, 0);
-    ROOT::Math::XYZPoint p4(-2, 0, 0);
-    ROOT::Math::XYZPoint p5(0, 2, 0);
-    ROOT::Math::XYZPoint p6(0, -2, 0);
-    ROOT::Math::XYZPoint p7(1.5, 1.5, 1.5);
-    ROOT::Math::XYZPoint p8(-1.5, 1.5, 1.5);
-    ROOT::Math::XYZPoint p9(1.5, -1.5, 1.5);
-    ROOT::Math::XYZPoint p10(1.5, 1.5, -1.5);
-    ROOT::Math::XYZPoint p11(-1.5, -1.5, 1.5);
-    ROOT::Math::XYZPoint p12(1.5, -1.5, -1.5);
-    ROOT::Math::XYZPoint p13(-1.5, 1.5, -1.5);
-    ROOT::Math::XYZPoint p14(-1.5, -1.5, -1.5);
+    Point p1(0,0,-2);
+    Point p2(0,0,2);
+    Point p3(2, 0, 0);
+    Point p4(-2, 0, 0);
+    Point p5(0, 2, 0);
+    Point p6(0, -2, 0);
+    Point p7(1.5, 1.5, 1.5);
+    Point p8(-1.5, 1.5, 1.5);
+    Point p9(1.5, -1.5, 1.5);
+    Point p10(1.5, 1.5, -1.5);
+    Point p11(-1.5, -1.5, 1.5);
+    Point p12(1.5, -1.5, -1.5);
+    Point p13(-1.5, 1.5, -1.5);
+    Point p14(-1.5, -1.5, -1.5);
 
-    ROOT::Math::XYZVector n1(0,0,1);
-    ROOT::Math::XYZVector n2(0,0,-1);
-    ROOT::Math::XYZVector n3(-1, 0, 0);
-    ROOT::Math::XYZVector n4(1, 0, 0);
-    ROOT::Math::XYZVector n5(0, -1, 0);
-    ROOT::Math::XYZVector n6(0, 1, 0);
-    ROOT::Math::XYZVector n7(-1, -1, -1);
-    ROOT::Math::XYZVector n8(1, -1, -1);
-    ROOT::Math::XYZVector n9(-1, 1, -1);
-    ROOT::Math::XYZVector n10(-1, -1, 1);
-    ROOT::Math::XYZVector n11(1, 1, -1);
-    ROOT::Math::XYZVector n12(-1, 1, 1);
-    ROOT::Math::XYZVector n13(1, -1, 1);
-    ROOT::Math::XYZVector n14(1, 1, 1);
-    std::vector<ROOT::Math::XYZPoint> p = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14};
-    std::vector<ROOT::Math::XYZVector> n = {n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14};
+    Vector n1(0,0,1);
+    Vector n2(0,0,-1);
+    Vector n3(-1, 0, 0);
+    Vector n4(1, 0, 0);
+    Vector n5(0, -1, 0);
+    Vector n6(0, 1, 0);
+    Vector n7(-1, -1, -1);
+    Vector n8(1, -1, -1);
+    Vector n9(-1, 1, -1);
+    Vector n10(-1, -1, 1);
+    Vector n11(1, 1, -1);
+    Vector n12(-1, 1, 1);
+    Vector n13(1, -1, 1);
+    Vector n14(1, 1, 1);
+    std::vector<Point> p = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14};
+    std::vector<Vector> n = {n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14};
     Threedpolygon polygon(p, n);
     polygon.DrawVertices();
     polygon.DrawWires();
