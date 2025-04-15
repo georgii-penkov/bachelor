@@ -134,7 +134,7 @@ class Particle
             if (m_alive)
             {
                 m_previous_position = m_position;
-                //use set coordinates method to keep it a positionvector and not convert to displacement vector
+                //use SetCoordinates method to keep it a positionvector and not convert to displacement vector
                 m_position->SetCoordinates(m_position->X() + dt * m_velocity->X(), m_position->Y() + dt * m_velocity->Y(), m_position->Z() + dt * m_velocity->Z());
                 m_path->SetNextPoint(m_position->X(), m_position->Y(), m_position->Z());
                 m_lifetime += dt;
