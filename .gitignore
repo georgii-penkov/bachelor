@@ -1,0 +1,7 @@
+#ignore compiled
+*.out
+#ignore frame generation
+frames*
+*.png
+#ignore compiler files
+*Zone.Identifier
