@@ -1,9 +1,39 @@
 #include <iostream>
+#include <map>
+
+std::vector<Double_t> GetXYZ(UInt_t id)
+{
+    static std::map<UInt_t, std::vector<Double_t>> coordinates;
+    if (coordinates.size()==0)
+    {
+        TFile *file = TFile::Open("./test.sim.root");
+        TTree *tiles_tree = file->Get<TTree>("alignment/tiles");
+        Double_t x;
+        Double_t y;
+        Double_t z;
+        UInt_t id;
+        tiles_tree->SetBranchAddress("posz", &x);
+        tiles_tree->SetBranchAddress("posz", &y);
+        tiles_tree->SetBranchAddress("posz", &z);
+        tiles_tree->SetBranchAddress("id", &id);
+        for (int i = 0; i < tiles_tree->GetEntries(); ++i)
+        {
+            tiles_tree->GetEntry(i);
+            std::vector<Double_t> temp;
+            temp.push_back(x);
+            temp.push_back(y);
+            temp.push_back(z);
+            coordinates[id] = temp;
+        };
+    };
+    return(coordinates[id]);
+};
+
+
 void treelooper()
 {
     TFile *file = TFile::Open("./test.sim.root");
     TTree *tiles_tree = file->Get<TTree>("alignment/tiles");
-    std::cout << tiles_tree << std::endl;
     Double_t z;
     UInt_t id;
     tiles_tree->SetBranchAddress("id", &id);
@@ -34,18 +64,12 @@ void treelooper()
         mu3e_tree->GetEntry(i);
         for (int j = 0; j < tile_hit_id->size(); ++j)
         {
-            for (int k = 0; k < tiles_tree->GetEntries(); ++k)
-            {
-                tiles_tree->GetEntry(k);
-                //std::cout << (*tile_hit_id)[0] << std::endl;
-                if ((*tile_hit_id)[j] == id) 
-                {
-                    z_distribution->Fill(z);
-                    std::cout << z << std::endl;
-                }; 
-            };
+            z_distribution->Fill(GetXYZ((*tile_hit_id)[j])[2]);
         };
-
     };
     z_distribution->Draw();
+    z_distribution->GetXaxis()->SetTitle("Z-Coordinate of Tile");
+    z_distribution->GetYaxis()->SetTitle("# of hits");
+    z_distribution->SetTitle("Z Distribution of hits");
+    canvas->SaveAs("./Z Distribution hits.png");
 };
