@@ -51,7 +51,7 @@ void treelooper()
     zposgraph->GetYaxis()->SetTitle("Z Position of Tile");
     zposgraph->SetTitle("Z Position vs ID of tiles in tile detector");
     zposgraph->Draw("ap");
-    canvas->SaveAs("./Z Position vs id.png");
+    canvas->SaveAs("./Images/Z Position vs id.png");
     canvas->Clear();
 
     auto z_distribution = new TH1F("H1", "H1", 200, -1000, 1000);
@@ -71,5 +71,5 @@ void treelooper()
     z_distribution->GetXaxis()->SetTitle("Z-Coordinate of Tile");
     z_distribution->GetYaxis()->SetTitle("# of hits");
     z_distribution->SetTitle("Z Distribution of hits");
-    canvas->SaveAs("./Z Distribution hits.png");
+    canvas->SaveAs("./Images/Z Distribution hits.png");
 };
