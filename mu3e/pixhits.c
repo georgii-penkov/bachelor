@@ -75,9 +75,9 @@ void pixhits()
     auto inner_pix_hits = new TGraph();
     auto outer_pix_hits = new TGraph();
     tile_hits->SetMarkerStyle(4);  
-    tile_hits->SetMarkerColor(kRed);
+    tile_hits->SetMarkerColor(kBlue);
     inner_pix_hits->SetMarkerStyle(4);  
-    inner_pix_hits->SetMarkerColor(kRed);
+    inner_pix_hits->SetMarkerColor(kGreen);
     outer_pix_hits->SetMarkerStyle(4);  
     outer_pix_hits->SetMarkerColor(kRed);
 
@@ -134,11 +134,9 @@ void pixhits()
 
 
     auto canvas3 = new TCanvas();
-    canvas3->Divide(1,3);
-    canvas3->cd(1); outer_pix_hits->Draw("AP");
-    canvas3->cd(2); inner_pix_hits->Draw("AP");
-    canvas3->cd(3); tile_hits->Draw("AP");
+    outer_pix_hits->Draw("AP");
+    inner_pix_hits->Draw("P");
+    tile_hits->Draw("P");
     canvas3->SaveAs("./Images/Tracking/BasicTracking.png");
-
 
 }
