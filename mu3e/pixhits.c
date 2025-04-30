@@ -70,9 +70,16 @@ void pixhits()
     auto pix_z_distribution = new TH1F("H1", "H1", 200, -1000, 1000);
     auto pix_r_distribution = new TH1F("H2", "H2", 200, -100, 100);
 
-    auto tile_hits = new TH2F("Tile hits", "Tile hits", 52, 0, 53, 56, 0, 57);
-    auto inner_pix_hits = new TH2F("inner_recurl_pix_hits", "Downstream inner recurl pixel hits", 25, -580, -240, 52, -3.15, 3.15);
-    auto outer_pix_hits = new TH2F("outer_recurl_pix_hits", "Downstream outer recurl pixel hits", 25, -580, -240, 52, -3.15, 3.15);
+
+    auto tile_hits = new TGraph();
+    auto inner_pix_hits = new TGraph();
+    auto outer_pix_hits = new TGraph();
+    tile_hits->SetMarkerStyle(4);  
+    tile_hits->SetMarkerColor(kRed);
+    inner_pix_hits->SetMarkerStyle(4);  
+    inner_pix_hits->SetMarkerColor(kRed);
+    outer_pix_hits->SetMarkerStyle(4);  
+    outer_pix_hits->SetMarkerColor(kRed);
 
     mu3e_tree->SetBranchAddress("tilehit_tile", &tile_hit_ids);
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
@@ -95,13 +102,23 @@ void pixhits()
             {
                 if (pix_r>70 and pix_r < 75)
                 {
-                    inner_pix_hits->Fill(pix_z, atan2(pix_y, pix_x));
+                    inner_pix_hits->AddPoint(pix_z, atan2(pix_y, pix_x));
                 };
                 if (pix_r>80 and pix_r< 90)
                 {
-                    outer_pix_hits->Fill(pix_z, atan2(pix_y, pix_x));
+                    outer_pix_hits->AddPoint(pix_z, atan2(pix_y, pix_x));
                 };
             }
+        };
+        for (int j = 0; j < tile_hit_ids->size(); ++j)
+        {
+            Double_t tile_x = GetTileXYZ((*tile_hit_ids)[j])[0];
+            Double_t tile_y = GetTileXYZ((*tile_hit_ids)[j])[1];
+            Double_t tile_z = GetTileXYZ((*tile_hit_ids)[j])[2];
+            if (tile_z < 0)
+            {
+                tile_hits->AddPoint(tile_z, atan2(tile_y, tile_x));
+            };
         };
     };
 
@@ -115,11 +132,13 @@ void pixhits()
     pix_r_distribution->Draw();
     canvas1->SaveAs("./Images/Tracking/Pixel R Distribution.png");
 
-    canvas1->Clear();
-    canvas1->Divide(1,3);
-    canvas1->cd(1); outer_pix_hits->Draw();
-    canvas1->cd(2); inner_pix_hits->Draw();
-    canvas1->cd(3); tile_hits->Draw();
+
+    auto canvas3 = new TCanvas();
+    canvas3->Divide(1,3);
+    canvas3->cd(1); outer_pix_hits->Draw("AP");
+    canvas3->cd(2); inner_pix_hits->Draw("AP");
+    canvas3->cd(3); tile_hits->Draw("AP");
+    canvas3->SaveAs("./Images/Tracking/BasicTracking.png");
 
 
 }
