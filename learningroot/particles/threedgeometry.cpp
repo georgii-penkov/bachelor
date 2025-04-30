@@ -1,6 +1,11 @@
 #include <vector>
 #include <cmath>
 
+//Doc
+/*
+Not recommended to create small geometries. better to use all lenghts/sizes > 1, and then use a Units scaling factor (m, mm, nm etc.)
+*/
+
 const double THRESHOLD = 0.00001;
 class Cartesian;
 class Point;
