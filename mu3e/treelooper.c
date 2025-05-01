@@ -12,9 +12,9 @@ std::vector<Double_t> GetXYZ(UInt_t id)
         Double_t y;
         Double_t z;
         UInt_t id;
-        tiles_tree->SetBranchAddress("posz", &x);
-        tiles_tree->SetBranchAddress("posz", &y);
-        tiles_tree->SetBranchAddress("posz", &z);
+        tiles_tree->SetBranchAddress("posx", &x);
+        tiles_tree->SetBranchAddress("posy", &y);
+        tiles_tree->SetBranchAddress("posz", &z);s
         tiles_tree->SetBranchAddress("id", &id);
         for (int i = 0; i < tiles_tree->GetEntries(); ++i)
         {
