@@ -459,7 +459,7 @@ void particles()
     rulers->SetAxisColor(kBlue, "Z");
     rulers->Draw();
 
-///*
+/*
     auto tile = new Tile(0,0,0,0,0,0, true);
     double half_photons = 250000;
     std::default_random_engine generator;
@@ -507,7 +507,7 @@ void particles()
     hist1->Draw("same");
     mycanvas->SaveAs("./Signal.png");
 
-//*/
+*/
     ///*
     auto a = MakeBrick(350,350,350, 0,0,0);
     a->DrawWires();
