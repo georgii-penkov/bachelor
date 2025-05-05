@@ -134,6 +134,9 @@ void pixhits()
 
 
     auto canvas3 = new TCanvas();
+    outer_pix_hits->SetMinimum(-3.15);
+    outer_pix_hits->SetMaximum(+3.15);
+    outer_pix_hits->GetXaxis()->SetLimits(-650, -200);y
     outer_pix_hits->Draw("AP");
     inner_pix_hits->Draw("P");
     tile_hits->Draw("P");
