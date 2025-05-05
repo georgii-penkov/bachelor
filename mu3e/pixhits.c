@@ -67,6 +67,22 @@ void pixhits()
     std::vector<UInt_t> *tile_hit_ids = new std::vector<UInt_t>;
     std::vector<UInt_t> *pix_hit_ids = new std::vector<UInt_t>;
 
+    std::vector<Int_t > *pid = new std::vector<Int_t>;
+    std::vector<Double_t> *vx = new std::vector<Double_t>;
+    std::vector<Double_t> *vy = new std::vector<Double_t>;
+    std::vector<Double_t> *vz = new std::vector<Double_t>;
+    std::vector<Double_t> *px = new std::vector<Double_t>;
+    std::vector<Double_t> *py = new std::vector<Double_t>;
+    std::vector<Double_t> *pz = new std::vector<Double_t>;
+    mu3e_tree->SetBranchAddress("traj_PID", &pid);
+    mu3e_tree->SetBranchAddress("traj_vx", &vx);
+    mu3e_tree->SetBranchAddress("traj_vy", &vy);
+    mu3e_tree->SetBranchAddress("traj_vz", &vz);
+    mu3e_tree->SetBranchAddress("traj_px", &px);
+    mu3e_tree->SetBranchAddress("traj_py", &py);
+    mu3e_tree->SetBranchAddress("traj_pz", &pz);
+
+
     auto pix_z_distribution = new TH1F("H1", "H1", 200, -1000, 1000);
     auto pix_r_distribution = new TH1F("H2", "H2", 200, -100, 100);
 
@@ -119,6 +135,13 @@ void pixhits()
             {
                 tile_hits->AddPoint(tile_z, atan2(tile_y, tile_x));
             };
+        };
+
+        //projected hits based on mc origin data (vertex position and start impulse)
+
+        for (int j = 0; j < pid->size(); ++j)
+        {
+            std::cout << pid->at(j) << std::endl << vx->at(j) << std::endl << vy->at(j) << std::endl << vz->at(j) << std::endl;
         };
     };
 
