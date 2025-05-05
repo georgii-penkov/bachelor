@@ -85,7 +85,7 @@ void pixhits()
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
 
     //for (int i = 0; i < mu3e_tree->GetEntries(); ++i)
-    for (int i = 0; i < 1; ++i)
+    for (int i = 1; i < 2; ++i)
     {
         mu3e_tree->GetEntry(i);
         for (int j = 0; j < pix_hit_ids->size(); ++j)
@@ -136,7 +136,7 @@ void pixhits()
     auto canvas3 = new TCanvas();
     outer_pix_hits->SetMinimum(-3.15);
     outer_pix_hits->SetMaximum(+3.15);
-    outer_pix_hits->GetXaxis()->SetLimits(-650, -200);y
+    outer_pix_hits->GetXaxis()->SetLimits(-650, -200);
     outer_pix_hits->Draw("AP");
     inner_pix_hits->Draw("P");
     tile_hits->Draw("P");
