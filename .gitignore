@@ -2,5 +2,6 @@
 *.out
 #ignore frame generation
 frames*
+frame*
 #ignore compiler files
 *Zone.Identifier

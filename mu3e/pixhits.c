@@ -99,9 +99,10 @@ void pixhits()
 
     mu3e_tree->SetBranchAddress("tilehit_tile", &tile_hit_ids);
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
+    auto canvas3 = new TCanvas();
 
     //for (int i = 0; i < mu3e_tree->GetEntries(); ++i)
-    for (int i = 2; i < 3; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         mu3e_tree->GetEntry(i);
         for (int j = 0; j < pix_hit_ids->size(); ++j)
@@ -114,7 +115,8 @@ void pixhits()
             pix_z_distribution->Fill(pix_z);
             pix_r_distribution->Fill(pix_r);
             //select only hits in 2 recurl stations.
-            if (pix_z < -200)
+            //if (pix_z < -200)
+            if (pix_z<-200 or pix_z > 200)
             {
                 if (pix_r>70 and pix_r < 75)
                 {
@@ -132,42 +134,29 @@ void pixhits()
             Double_t tile_x = GetTileXYZ((*tile_hit_ids)[j])[0];
             Double_t tile_y = GetTileXYZ((*tile_hit_ids)[j])[1];
             Double_t tile_z = GetTileXYZ((*tile_hit_ids)[j])[2];
-            if (tile_z < 0)
+            //if (tile_z < 0)
+            if(true)
             {
                 tile_hits->AddPoint(tile_z, atan2(tile_y, tile_x));
             };
         };
-
-        //projected hits based on mc origin data (vertex position and start impulse)
-
-        for (int j = 0; j < pid->size(); ++j)
-        {
-            int charge = 0;
-            if (pid->at(j) == 11) {charge = 1;}
-            else if (pid->at(j) == -11) {charge = -1;}
-            else continue;
-
-            //std::cout << pid->at(j) << std::endl << vx->at(j) << std::endl << vy->at(j) << std::endl << vz->at(j) << std::endl << px->at(j) << std::endl << py->at(j) << std::endl << pz->at(j) << std::endl;
-            ROOT::Math::XYZVector B(0,0,0.0001);
-            ROOT::Math::XYZPoint origin(vx->at(j), vy->at(j), vz->at(j));
-            ROOT::Math::XYZVector impulse (px->at(j), py->at(j), pz->at(j));
-            double radius = sqrt(impulse.Mag2()/B.Mag2());
-            std::cout << radius << std::endl;
-            ROOT::Math::XYZPoint spiral_point;
-            spiral_point = origin + charge*(impulse.Cross(B)).Unit()*radius; //could be minus charge
-            double r = 72.8849;
-            ROOT::Math::XYZPoint I1;
-            ROOT::Math::XYZPoint I2;
-            ROOT::Math::XYZPoint zero(0,0,vz->at(j));
-            ROOT::Math::XYZPoint P = zero + (r*r - radius*radius + (spiral_point - zero).Mag2())/(2*sqrt((spiral_point - zero).Mag2()))*(spiral_point-zero).Unit();
-            I1 = P + sqrt(r*r-P.Mag2())*((P-zero).Cross(B).Unit());
-            I2 = P - sqrt(r*r-P.Mag2())*((P-zero).Cross(B).Unit());
-            //std::cout << spiral_point.X() << std::endl << spiral_point.Y() << std::endl << spiral_point.Z() << std::endl;
-            
-            //std::cout << I2 << std::endl;
-
-
-        };
+        outer_pix_hits->SetMinimum(-3.15);
+        outer_pix_hits->SetMaximum(+3.15);
+        outer_pix_hits->GetXaxis()->SetLimits(-650, 650);
+        outer_pix_hits->Draw("AP");
+        inner_pix_hits->Draw("P");
+        tile_hits->Draw("P");
+        string numberstr = std::to_string(i);
+        char path[24] = "./Images/Tracking/frame";
+        char png[5] = ".png";
+        const char* number(numberstr.c_str());
+        std::strcat(path, number);
+        std::strcat(path,png);
+        canvas3->SaveAs(path);
+        canvas3->Clear();
+        outer_pix_hits->Set(0);
+        inner_pix_hits->Set(0);
+        tile_hits->Set(0);
     };
 
 
@@ -179,15 +168,5 @@ void pixhits()
     auto canvas2 = new TCanvas();
     pix_r_distribution->Draw();
     canvas2->SaveAs("./Images/Tracking/Pixel R Distribution.png");
-
-
-    auto canvas3 = new TCanvas();
-    outer_pix_hits->SetMinimum(-3.15);
-    outer_pix_hits->SetMaximum(+3.15);
-    outer_pix_hits->GetXaxis()->SetLimits(-650, -200);
-    outer_pix_hits->Draw("AP");
-    inner_pix_hits->Draw("P");
-    tile_hits->Draw("P");
-    canvas3->SaveAs("./Images/Tracking/BasicTracking.png");
 
 }
