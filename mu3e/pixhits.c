@@ -141,7 +141,19 @@ void pixhits()
 
         for (int j = 0; j < pid->size(); ++j)
         {
-            std::cout << pid->at(j) << std::endl << vx->at(j) << std::endl << vy->at(j) << std::endl << vz->at(j) << std::endl;
+            int charge = 0;
+            if (pid->at(j) == 11) charge = 1;
+            if (pid->at(j) == -11) charge = -1;
+            else continue;
+
+            std::cout << pid->at(j) << std::endl << vx->at(j) << std::endl << vy->at(j) << std::endl << vz->at(j) << std::endl << px->at(j) << std::endl << py->at(j) << std::endl << pz->at(j) << std::endl;
+            ROOT::Math::XYZVector B(0,0,1/1000);
+            ROOT::Math::XYZPoint origin(vx->at(j), vy->at(j), vz->at(j));
+            ROOT::Math::XYZVector impulse (px->at(j), py->at(j), pz->at(j));
+            double radius = sqrt(impulse.Mag2()/B.Mag2());
+            ROOT::Math::XYZPoint spiral_point;
+            spiral_point = origin + charge*impulse.Cross(B).Unit()*radius;
+
         };
     };
 
