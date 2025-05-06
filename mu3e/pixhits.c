@@ -101,7 +101,7 @@ void pixhits()
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
 
     //for (int i = 0; i < mu3e_tree->GetEntries(); ++i)
-    for (int i = 1; i < 2; ++i)
+    for (int i = 2; i < 3; ++i)
     {
         mu3e_tree->GetEntry(i);
         for (int j = 0; j < pix_hit_ids->size(); ++j)
@@ -178,7 +178,7 @@ void pixhits()
     canvas1->SaveAs("./Images/Tracking/Pixel Z Distribution.png");
     auto canvas2 = new TCanvas();
     pix_r_distribution->Draw();
-    canvas1->SaveAs("./Images/Tracking/Pixel R Distribution.png");
+    canvas2->SaveAs("./Images/Tracking/Pixel R Distribution.png");
 
 
     auto canvas3 = new TCanvas();

@@ -1,0 +1,10 @@
+positive z hit plot
+attempt clustering with measure \Delta theta  z. loop over hits, calculate distance to other hits, make cluster.
+visible cluster of hits. timing separation? is it one cluster??
+missing hit in one of the detectors?
+
+
+Timing calibration. We define cluster in sim data, look at delta t of hits. 
+then take real data, same cluster, delta t.
+same delta t?
+same delta t distibution (over z)
