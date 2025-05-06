@@ -118,6 +118,7 @@ void pixhits()
             {
                 if (pix_r>70 and pix_r < 75)
                 {
+                    // actual radius 72.8849
                     inner_pix_hits->AddPoint(pix_z, atan2(pix_y, pix_x));
                 };
                 if (pix_r>80 and pix_r< 90)
@@ -142,17 +143,29 @@ void pixhits()
         for (int j = 0; j < pid->size(); ++j)
         {
             int charge = 0;
-            if (pid->at(j) == 11) charge = 1;
-            if (pid->at(j) == -11) charge = -1;
+            if (pid->at(j) == 11) {charge = 1;}
+            else if (pid->at(j) == -11) {charge = -1;}
             else continue;
 
-            std::cout << pid->at(j) << std::endl << vx->at(j) << std::endl << vy->at(j) << std::endl << vz->at(j) << std::endl << px->at(j) << std::endl << py->at(j) << std::endl << pz->at(j) << std::endl;
-            ROOT::Math::XYZVector B(0,0,1/1000);
+            //std::cout << pid->at(j) << std::endl << vx->at(j) << std::endl << vy->at(j) << std::endl << vz->at(j) << std::endl << px->at(j) << std::endl << py->at(j) << std::endl << pz->at(j) << std::endl;
+            ROOT::Math::XYZVector B(0,0,0.0001);
             ROOT::Math::XYZPoint origin(vx->at(j), vy->at(j), vz->at(j));
             ROOT::Math::XYZVector impulse (px->at(j), py->at(j), pz->at(j));
             double radius = sqrt(impulse.Mag2()/B.Mag2());
+            std::cout << radius << std::endl;
             ROOT::Math::XYZPoint spiral_point;
-            spiral_point = origin + charge*impulse.Cross(B).Unit()*radius;
+            spiral_point = origin + charge*(impulse.Cross(B)).Unit()*radius; //could be minus charge
+            double r = 72.8849;
+            ROOT::Math::XYZPoint I1;
+            ROOT::Math::XYZPoint I2;
+            ROOT::Math::XYZPoint zero(0,0,vz->at(j));
+            ROOT::Math::XYZPoint P = zero + (r*r - radius*radius + (spiral_point - zero).Mag2())/(2*sqrt((spiral_point - zero).Mag2()))*(spiral_point-zero).Unit();
+            I1 = P + sqrt(r*r-P.Mag2())*((P-zero).Cross(B).Unit());
+            I2 = P - sqrt(r*r-P.Mag2())*((P-zero).Cross(B).Unit());
+            //std::cout << spiral_point.X() << std::endl << spiral_point.Y() << std::endl << spiral_point.Z() << std::endl;
+            
+            //std::cout << I2 << std::endl;
+
 
         };
     };
