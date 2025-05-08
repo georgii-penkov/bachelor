@@ -58,7 +58,8 @@
         "fstream": "c",
         "iomanip": "c",
         "sstream": "c",
-        "bitset": "c"
+        "bitset": "c",
+        "threedgeometry.cpp": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
