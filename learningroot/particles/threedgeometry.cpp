@@ -123,7 +123,9 @@ Vector Vector::operator-(const Vector& vector)
 };
 
 Vector& Vector::operator+=(const Vector& vector)
-{#include <tbb/tbb.h>
+{
+    this->SetX(this->X() + vector.X());
+    this->SetY(this->Y() + vector.Y());
     this->SetZ(this->Z() + vector.Z());
     return(*this);
 }
@@ -409,7 +411,12 @@ class Face
 
 };
 
-class Threedpolygon
+class ThreeDGeometry
+{
+    virtual Vector Normal(Point* point) = 0;
+};
+
+class Threedpolygon : public ThreeDGeometry
 {
     public:
         std::vector<Face*> faces;

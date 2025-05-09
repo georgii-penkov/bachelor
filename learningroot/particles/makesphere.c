@@ -3,7 +3,7 @@
 
 void makesphere()
 {
-    int n = 15;
+    int n = 10;
     double r = 20;
     Point origin(1,1,1);
     std::vector<Point> points;
@@ -13,8 +13,9 @@ void makesphere()
     {
         for (int j = 0; j <= n; ++j)
         {
-            if (j==n and i!=0) continue; //prevent weirdness at bottom plane z = -r. FLoating point division for theta j/n, if j==n does not give exactly 1, bc floating point division, lots of planes for different phi with very very slightly tilted to each other, gives lots of unwanted points. Ensure bottom plane only drawn once for phi = 0. Same not necessary for top plane because 0/n actually good 0.
-            double phi = 2*M_PI * i/n;
+            if (j==n and i!=0) continue;    //prevent weirdness at bottom plane z = -r. FLoating point division for theta = ... j/n, if j==n does not give exactly 1, bc floating point division, lots of planes for different phi with very very slightly tilted to each other, gives lots of unwanted points. Ensure bottom plane only drawn once for phi = 0. Same not necessary for top plane because 0/n actually good 0.
+            if (j==0 and i!=0) continue;    //still do only one plane for top even though does not seem necessary to prevent unexpected weirdness and be consistent.
+            double phi = 2*M_PI * i/n;  
             double theta = M_PI * j/n;
             Point p(r*sin(theta)*cos(phi), r*sin(theta)*sin(phi), r*cos(theta));
             p = p + origin;

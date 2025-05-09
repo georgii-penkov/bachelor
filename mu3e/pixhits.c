@@ -60,6 +60,15 @@ std::vector<Double_t> GetPixXYZ(UInt_t id)
 };
 
 
+struct Cluster
+{
+    std::vector<UInt_t> outer_pix_hits;
+    std::vector<UInt_t> inner_pix_hits;
+    std::vector<UInt_t> tile_hits;
+    UInt_t frame_id;
+};
+
+
 void pixhits()
 {
     TFile *file = TFile::Open("./test.sim.root");
@@ -115,7 +124,6 @@ void pixhits()
             pix_z_distribution->Fill(pix_z);
             pix_r_distribution->Fill(pix_r);
             //select only hits in 2 recurl stations.
-            //if (pix_z < -200)
             if (pix_z<-200 or pix_z > 200)
             {
                 if (pix_r>70 and pix_r < 75)
