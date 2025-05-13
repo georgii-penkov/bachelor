@@ -129,10 +129,12 @@ void pixhits()
                 if (pix_r>70 and pix_r < 75)
                 {
                     // actual radius 72.8849
+                    std::cout << pix_r << std::endl;
                     inner_pix_hits->AddPoint(pix_z, atan2(pix_y, pix_x));
                 };
                 if (pix_r>80 and pix_r< 90)
                 {
+                    std::cout << pix_r << std::endl;
                     outer_pix_hits->AddPoint(pix_z, atan2(pix_y, pix_x));
                 };
             }
@@ -142,6 +144,7 @@ void pixhits()
             Double_t tile_x = GetTileXYZ((*tile_hit_ids)[j])[0];
             Double_t tile_y = GetTileXYZ((*tile_hit_ids)[j])[1];
             Double_t tile_z = GetTileXYZ((*tile_hit_ids)[j])[2];
+            std::cout << sqrt(tile_x*tile_x + tile_y*tile_y) << std::endl;
             //if (tile_z < 0)
             if(true)
             {
