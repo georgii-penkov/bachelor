@@ -27,7 +27,7 @@ void clusters()
     std::vector<TGraph*> tracks;
 
     //for (int i = 0; i < mu3e_tree->GetEntries(); ++i)
-    for (int i = 1; i < 2; ++i)
+    for (int i = 2; i < 3; ++i)
     {
         mu3e_tree->GetEntry(i);
         std::vector<bool> *used_tile_hits = new std::vector<bool>(tile_hit_ids->size());
@@ -86,8 +86,9 @@ void clusters()
                     ROOT::Math::XYZVector inner_to_tile = tile_hit - inner_pix_hit;
                     bool colinear = false;
                     bool equidistant = false;
-                    colinear = (outer_to_inner.Unit().Dot(inner_to_tile.Unit()) > 1 - 0.1);
-                    equidistant = (outer_to_inner.Mag2()/inner_to_tile.Mag2()*pow((R_PIX_OUT-R_PIX_IN)/(R_PIX_IN-R_TILES),2) < 1.5 and (outer_to_inner.Mag2()/inner_to_tile.Mag2()*pow((R_PIX_OUT-R_PIX_IN)/(R_PIX_IN-R_TILES),2)  > 0.5));
+                    colinear = (outer_to_inner.Unit().Dot(inner_to_tile.Unit()) > 1 - 0.25);
+                    //equidistant = (outer_to_inner.Mag2()/inner_to_tile.Mag2() < 2 and (outer_to_inner.Mag2()/inner_to_tile.Mag2()  > 0.5));
+                    equidistant = true;
                     if (colinear and equidistant)
                     {
                         used_pix_hits->at(j) = true;
