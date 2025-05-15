@@ -1,5 +1,6 @@
 #include <vector>
 #include <cmath>
+//requires source /opt/intel/oneapi/tbb/latest/env/vars.sh
 #include <tbb/tbb.h>
 
 //Doc

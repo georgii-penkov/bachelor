@@ -57,7 +57,7 @@ void clusters()
         for (int j = 0; j < pix_hit_ids->size(); ++j)
         {
             if (!is_inner_pix->at(j)) continue;
-            if (used_pix_hits->at(j)) continue;
+            //if (used_pix_hits->at(j)) continue;
             ROOT::Math::XYZPoint inner_pix_hit;
             inner_pix_hit.SetX(GetPixXYZ((pix_hit_ids->at(j)>>16))[0]);
             inner_pix_hit.SetY(GetPixXYZ((pix_hit_ids->at(j)>>16))[1]);
@@ -66,16 +66,16 @@ void clusters()
             for (int k = 0; k < pix_hit_ids->size(); ++k)
             {
                 if (!is_outer_pix->at(k)) continue;
-                if (used_pix_hits->at(k)) continue;
+                //if (used_pix_hits->at(k)) continue;
                 ROOT::Math::XYZPoint outer_pix_hit;
                 outer_pix_hit.SetX(GetPixXYZ((pix_hit_ids->at(k)>>16))[0]);
                 outer_pix_hit.SetY(GetPixXYZ((pix_hit_ids->at(k)>>16))[1]);
                 outer_pix_hit.SetZ(GetPixXYZ((pix_hit_ids->at(k)>>16))[2]);
                 for (int l = 0; l < tile_hit_ids->size(); ++l)
                 {
-                    if (used_pix_hits->at(k)) continue;
-                    if (used_pix_hits->at(j)) continue;
-                    if (used_tile_hits->at(l)) continue;
+                    //if (used_pix_hits->at(k)) continue;
+                    //if (used_pix_hits->at(j)) continue;
+                    //if (used_tile_hits->at(l)) continue;
                     ROOT::Math::XYZPoint tile_hit;
                     tile_hit.SetX(GetTileXYZ(tile_hit_ids->at(l))[0]);
                     tile_hit.SetY(GetTileXYZ(tile_hit_ids->at(l))[1]);
@@ -86,9 +86,9 @@ void clusters()
                     ROOT::Math::XYZVector inner_to_tile = tile_hit - inner_pix_hit;
                     bool colinear = false;
                     bool equidistant = false;
+                    double max_length_factor = 3;
                     colinear = (outer_to_inner.Unit().Dot(inner_to_tile.Unit()) > 1 - 0.25);
-                    //equidistant = (outer_to_inner.Mag2()/inner_to_tile.Mag2() < 2 and (outer_to_inner.Mag2()/inner_to_tile.Mag2()  > 0.5));
-                    equidistant = true;
+                    equidistant = (sqrt(outer_to_inner.Mag2()/inner_to_tile.Mag2()) < max_length_factor and sqrt(outer_to_inner.Mag2()/inner_to_tile.Mag2()  > 1/max_length_factor));
                     if (colinear and equidistant)
                     {
                         used_pix_hits->at(j) = true;
