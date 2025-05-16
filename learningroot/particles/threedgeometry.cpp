@@ -178,7 +178,7 @@ Vector operator*(const Vector& vector, const double& scalar)
 
 
 
-
+//Rotation of Points and Vectors using Tait Bryan angles
 void RotatePoint(Point* point, double t_x, double t_y, double t_z)
 {
     Point old_point = *point;
