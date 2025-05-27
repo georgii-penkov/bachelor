@@ -2,6 +2,20 @@
 #include <string>
 #include <cmath>
 
+struct MinMax
+{
+    double min = 0;
+    double max = 0;
+};
+
+MinMax MinMax(float x = 0.0)
+{
+    static struct MinMax minmax;
+    if (minmax.max < x) minmax.max = x;
+    if (minmax.min > x) minmax.min = x;
+    return(minmax);
+};
+
 Threedpolygon* MakeBrick(double xwidth = 1, double ylength = 1, double zheight = 1, double xpos = 0, double ypos = 0, double zpos = 0)
 {
     Point p1( xwidth/2, 0, 0);
@@ -53,10 +67,9 @@ Threedpolygon* EdgeScintillator()
 };
 
 
-void assembly(std::string filename = "./test.sim.root")
+void assembly(std::string filename = "./alignment_tree_localsetup.root")
 {
     auto mycanvas = new TCanvas();
-
     const char* str = filename.c_str();
     std::vector<Threedpolygon*> detector;
     TFile *file = TFile::Open(str);
@@ -72,12 +85,18 @@ void assembly(std::string filename = "./test.sim.root")
 
     for (int i = 0; i < alignment->GetEntries(); ++i)
     {
+        
         alignment->GetEntry(i);
         detector.push_back(MakeBrick(6.3, 6.21, 5, 0,0,0));
         detector[i]->Rotate(0, std::atan2(sqrt(vx*vx+vy*vy), vz), std::atan2(vy, vx));
-        detector[i]->Move(x, y, z);
+        detector[i]->Move(10*x, 10*y, 10*z);
         detector[i]->DrawWires();
+        MinMax(10*x);
+        MinMax(10*y);
+        MinMax(10*z);
+
     };
+
     auto rulers = new TAxis3D();
     rulers->SetAxisColor(kRed, "X");
     rulers->SetAxisColor(kGreen, "Y");
@@ -86,13 +105,14 @@ void assembly(std::string filename = "./test.sim.root")
 
     TPolyMarker3D *scaler = new TPolyMarker3D(6);
 
-
-    scaler->SetPoint(0,  -500,  0,  0);  // X mim
-    scaler->SetPoint(1,  500,  0,  0);  // X max
-    scaler->SetPoint(2,  0, -500,  0);  // Y min
-    scaler->SetPoint(3,  0,  500,  0);  // Y max
-    scaler->SetPoint(4,  0,  0, -500);  // Z min
-    scaler->SetPoint(5,  0,  0,  500);  // Z max
+    float max = MinMax().max;
+    float min = MinMax().min;
+    scaler->SetPoint(0,  min,  0,  0);  // X min
+    scaler->SetPoint(1,  max,  0,  0);  // X max
+    scaler->SetPoint(2,  0,  min,  0);  // Y min
+    scaler->SetPoint(3,  0,  max,  0);  // Y max
+    scaler->SetPoint(4,  0,  0,  min);  // Z min
+    scaler->SetPoint(5,  0,  0,  max);  // Z max
 
     scaler->SetMarkerColor(0); // invisible
     scaler->Draw();
