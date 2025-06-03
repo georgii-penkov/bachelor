@@ -8,6 +8,53 @@
 
 #include <iostream>
 
+class Cube
+{
+    public:
+    glm::mat4 translation = glm::mat4(1.0f);
+    glm::mat4 rotation = glm::mat4(1.0f);
+    glm::mat4 resize = glm::mat4(1.0f);
+    glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        Cube(){}
+    glm::mat4 modelmatrix()
+    {
+        return(translation*rotation*resize);
+    };
+
+    float vertices[8*3] = {
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f
+    };
+    unsigned int indices[36] = {  // note that we start from 0!
+    // Front face
+    1, 5, 7,
+    1, 7, 3,
+    // Back face
+    0, 2, 6,
+    0, 6, 4,
+    // Left face
+    0, 1, 3,
+    0, 3, 2,
+    // Right face
+    4, 6, 7,
+    4, 7, 5,
+    // Top face
+    2, 3, 7,
+    2, 7, 6,
+    // Bottom face
+    0, 4, 5,
+    0, 5, 1
+    };
+
+};
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -53,36 +100,10 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f,  0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f,  0.5f
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-    // Front face
-    1, 5, 7,
-    1, 7, 3,
-    // Back face
-    0, 2, 6,
-    0, 6, 4,
-    // Left face
-    0, 1, 3,
-    0, 3, 2,
-    // Right face
-    4, 6, 7,
-    4, 7, 5,
-    // Top face
-    2, 3, 7,
-    2, 7, 6,
-    // Bottom face
-    0, 4, 5,
-    0, 5, 1
-    };
+    Cube cube1;
+    cube1.resize = glm::scale(cube1.resize, glm::vec3(0.5, 0.5, 0.5)); 
+    cube1.translation = glm::translate(cube1.translation, glm::vec3(0.5f, 0.5f, 0.0f));
+
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -91,10 +112,10 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube1.vertices), cube1.vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube1.indices), cube1.indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -124,7 +145,14 @@ int main()
 
 
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));
+
+        glm::mat4 view = glm::mat4 (1.0f);
+        view = glm::translate(view, glm::vec3(1.0f*sin(glfwGetTime()), 0.0f, 1.0f*cos(glfwGetTime())-5));
+
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        trans = trans*projection*view*cube1.modelmatrix();
 
         // render
         // ------
