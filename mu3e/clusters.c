@@ -1,18 +1,39 @@
 #include "getxyz.c"
+#include <iostream>
+#include <vector>
+#include "TROOT.h"
+#include "TTree.h"
+#include "TFile.h"
+#include "TGraph.h"
+#include "TMath.h"
+#include "Math/Point3D.h"
+#include "Math/Vector3D.h"
+#include "TAxis.h"
+#include "TCanvas.h"
+#include <TApplication.h> //to show the gui and not exit immediately
+#include "TH1F.h"
+#include <algorithm>
 
 double R_TILES = 60.6638;
 double R_PIX_IN = 72.8849;
 double R_PIX_OUT = 85.7547;
 
-void clusters()
+
+
+int main()
 {
+    int argc = 1;
+    char* argv[] = { (char*)"app", nullptr };
+    TApplication app("app", &argc, argv);
     TFile *file = TFile::Open("./test.sim.root");
     TTree *mu3e_tree = file->Get<TTree>("mu3e");
     std::vector<UInt_t> *tile_hit_ids = new std::vector<UInt_t>;
     std::vector<UInt_t> *pix_hit_ids = new std::vector<UInt_t>;
+    std::vector<Double_t> *tile_times = new std::vector<Double_t>;
 
     mu3e_tree->SetBranchAddress("tilehit_tile", &tile_hit_ids);
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
+    mu3e_tree->SetBranchAddress("tilehit_timestamp", &tile_times);
 
     auto tile_hits = new TGraph();
     auto inner_pix_hits = new TGraph();
@@ -24,11 +45,13 @@ void clusters()
     outer_pix_hits->SetMarkerStyle(4);  
     outer_pix_hits->SetMarkerColor(kRed);
 
+
+
     std::vector<TGraph*> tracks;
 
     //for (int i = 0; i < mu3e_tree->GetEntries(); ++i)
-    for (int i = 2; i < 3; ++i)
-    {
+    for (int i = 0; i < 1; ++i)
+    {   auto canvas1 = new TCanvas();
         mu3e_tree->GetEntry(i);
         std::vector<bool> *used_tile_hits = new std::vector<bool>(tile_hit_ids->size());
         std::vector<bool> *used_pix_hits = new std::vector<bool>(pix_hit_ids->size());
@@ -126,7 +149,23 @@ void clusters()
         {
             (tracks[i])->Draw("L");
         };
+        auto canvas2 = new TCanvas();
+        auto times = new TH1F("Tile hit times", "Tile hit times", 100, *std::min_element(tile_times->begin(), tile_times->end()), *std::max_element(tile_times->begin(), tile_times->end()));
+        for (int j = 0; j < tile_times->size(); ++j)
+        {
+            times->Fill(tile_times->at(j));
+            std::cout << tile_times->at(j) << std::endl;
+        };
+        times->Draw();
+
     };
 
+    app.Run();
+    return(0);
 
-}
+};
+
+void clusters() //for running as a root macro with cling
+{
+    main();
+};

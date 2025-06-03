@@ -2,6 +2,10 @@
 #include <map>
 #include <bitset>
 #include <math.h>
+#include <vector>
+#include "TROOT.h"
+#include "TTree.h"
+#include "TFile.h"
 
 std::vector<Double_t> GetTileXYZ(UInt_t id)
 {
