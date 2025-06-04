@@ -30,10 +30,12 @@ int main()
     std::vector<UInt_t> *tile_hit_ids = new std::vector<UInt_t>;
     std::vector<UInt_t> *pix_hit_ids = new std::vector<UInt_t>;
     std::vector<Double_t> *tile_times = new std::vector<Double_t>;
+    std::vector<Double_t> *fibre_times = new std::vector<Double_t>;
 
     mu3e_tree->SetBranchAddress("tilehit_tile", &tile_hit_ids);
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
-    mu3e_tree->SetBranchAddress("tilehit_timestamp", &tile_times);
+    mu3e_tree->SetBranchAddress("tilehit_time", &tile_times);
+    mu3e_tree->SetBranchAddress("figrehit_time", &fibre_times)
 
     auto tile_hits = new TGraph();
     auto inner_pix_hits = new TGraph();
@@ -50,8 +52,10 @@ int main()
     std::vector<TGraph*> tracks;
 
     //for (int i = 0; i < mu3e_tree->GetEntries(); ++i)
-    for (int i = 0; i < 1; ++i)
-    {   auto canvas1 = new TCanvas();
+    for (int i = 3; i < 4; ++i)
+    {   
+        double framestart = 6400+50*i
+        auto canvas1 = new TCanvas();
         mu3e_tree->GetEntry(i);
         std::vector<bool> *used_tile_hits = new std::vector<bool>(tile_hit_ids->size());
         std::vector<bool> *used_pix_hits = new std::vector<bool>(pix_hit_ids->size());
