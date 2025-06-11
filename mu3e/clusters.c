@@ -35,7 +35,7 @@ int main()
     mu3e_tree->SetBranchAddress("tilehit_tile", &tile_hit_ids);
     mu3e_tree->SetBranchAddress("hit_pixelid", &pix_hit_ids);
     mu3e_tree->SetBranchAddress("tilehit_time", &tile_times);
-    mu3e_tree->SetBranchAddress("figrehit_time", &fibre_times)
+    mu3e_tree->SetBranchAddress("fibrehit_time", &fibre_times)
 
     auto tile_hits = new TGraph();
     auto inner_pix_hits = new TGraph();
