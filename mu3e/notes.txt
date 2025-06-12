@@ -1,0 +1,1 @@
+ g++ time_clusters.c $(root-config --cflags --libs) to compile c++ files containing root syntax. #include all used root headers like "TH1F.h"

@@ -59,7 +59,20 @@
         "iomanip": "c",
         "sstream": "c",
         "bitset": "c",
-        "threedgeometry.cpp": "c"
+        "threedgeometry.cpp": "c",
+        "csignal": "c",
+        "strstream": "c",
+        "complex": "c",
+        "condition_variable": "c",
+        "set": "c",
+        "unordered_set": "c",
+        "optional": "c",
+        "mutex": "c",
+        "cfenv": "c",
+        "cinttypes": "c",
+        "typeindex": "c",
+        "valarray": "c",
+        "variant": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
