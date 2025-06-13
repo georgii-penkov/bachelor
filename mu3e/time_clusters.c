@@ -308,7 +308,7 @@ int main()
 
 };
 
-void clusters() //for running as a root macro with cling
+void time_clusters() //for running as a root macro with cling
 {
     main();
 };
