@@ -229,6 +229,7 @@ int main()
         gStyle->SetPalette(kBird);
         int color = 0;
         double radius = 100;
+        double timewalk = 7.5;
         std::vector<TGraph*> space_clusters;
         std::vector<TH1F*> cluster_times;
         std::cout << "color" << std::endl;
@@ -248,6 +249,7 @@ int main()
             cluster_times.back()->SetLineColor(color);
             cluster_times.back()->SetFillColor(color);
             ROOT::Math::XYZPoint center = ToRootPoint(GetPixXYZ((pix_hit_ids->at(j)>>16)));   
+            double center_time = pix_times->at(j);
             space_clusters.back()->AddPoint(center.Z(), atan2(center.Y(), center.X()));
             cluster_times.back()->Fill(pix_times->at(j));
             circles.push_back(new TEllipse(center.Z(), atan2(center.Y(), center.X()),radius ,radius/R_PIX_IN));
@@ -256,8 +258,11 @@ int main()
             {
                 if (clustering_used_pix->at(k)) continue;
                 ROOT::Math::XYZPoint current = ToRootPoint(GetPixXYZ((pix_hit_ids->at(k)>>16)));
+                double current_time = pix_times->at(k);
                 std::cout << current.X() << std::endl;
-                if (sqrt(pow(center.Z()-current.Z(), 2) + pow(R_PIX_IN*(atan2(current.Y(), current.X())-atan2(center.Y(), center.X())),2)) < radius)
+                bool is_close_enough = (sqrt(pow(center.Z()-current.Z(), 2) + pow(R_PIX_IN*(atan2(current.Y(), current.X())-atan2(center.Y(), center.X())),2)) < radius);
+                bool is_soon_enough = pow(current_time - center_time, 2) <= timewalk*timewalk;
+                if (is_close_enough and is_soon_enough)
                 {
                     clustering_used_pix->at(k) = true;
                     space_clusters.back()->AddPoint(current.Z(), atan2(current.Y(), current.X()));
@@ -269,8 +274,11 @@ int main()
             {
                 if (clustering_used_tiles->at(k)) continue;
                 ROOT::Math::XYZPoint current = ToRootPoint(GetTileXYZ(tile_hit_ids->at(k)));
+                double current_time = tile_times->at(k);
                 std::cout << current.X() << std::endl;
-                if (sqrt(pow(center.Z()-current.Z(), 2) + pow(R_PIX_IN*(atan2(current.Y(), current.X())-atan2(center.Y(), center.X())),2)) < radius)
+                bool is_close_enough = (sqrt(pow(center.Z()-current.Z(), 2) + pow(R_PIX_IN*(atan2(current.Y(), current.X())-atan2(center.Y(), center.X())),2)) < radius);
+                bool is_soon_enough = pow(current_time - center_time, 2) <= timewalk*timewalk;
+                if (is_close_enough and is_soon_enough)
                 {
                     clustering_used_tiles->at(k) = true;
                     space_clusters.back()->AddPoint(current.Z(), atan2(current.Y(), current.X()));
